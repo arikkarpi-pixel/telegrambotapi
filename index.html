@@ -11,29 +11,36 @@
 <body>
     <!-- Telegram WebApp панель -->
     <div id="telegramPanel" class="telegram-panel">
-        <span>Crypto Bot</span>
-        <button class="tg-close" onclick="closeTelegramPanel()">×</button>
+        <div class="tg-header">
+            <span class="tg-title">Crypto Bot</span>
+            <button class="tg-close" onclick="closeTelegramPanel()">×</button>
+        </div>
     </div>
 
     <div class="app-container">
-        <!-- Шапка -->
+        <!-- Шапка с балансом -->
         <header class="header">
             <div class="balance-display">
                 <span class="balance-label">Общий баланс в USD</span>
-                <span class="balance-amount" id="totalBalance">$4059.61</span>
+                <span class="balance-amount" id="totalBalance">$4,059.61</span>
+                <div class="balance-change" id="balanceChange">+0.00%</div>
             </div>
             <div class="actions">
-                <button class="action-btn" onclick="showDeposit()">
-                    <i class="fas fa-plus-circle"></i> Пополнить
+                <button class="action-btn" onclick="showModal('deposit')">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Пополнить</span>
                 </button>
-                <button class="action-btn" onclick="showWithdraw()">
-                    <i class="fas fa-arrow-up"></i> Вывести
+                <button class="action-btn" onclick="showModal('withdraw')">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Вывести</span>
                 </button>
-                <button class="action-btn" onclick="showExchange()">
-                    <i class="fas fa-exchange-alt"></i> Обмен
+                <button class="action-btn" onclick="showModal('exchange')">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Обмен</span>
                 </button>
-                <button class="action-btn" onclick="showMarket()">
-                    <i class="fas fa-chart-line"></i> Биржа
+                <button class="action-btn" onclick="showModal('market')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Биржа</span>
                 </button>
             </div>
         </header>
@@ -52,11 +59,11 @@
         <!-- Активы -->
         <main class="assets-section">
             <div class="assets-header">
-                <h2>Активы</h2>
+                <h2><i class="fas fa-coins"></i> Активы</h2>
                 <label class="toggle-small">
                     <input type="checkbox" id="hideSmallBalances">
                     <span class="toggle-slider"></span>
-                    <span class="toggle-text">Скрыть мелкие балансы</span>
+                    <span class="toggle-text">Скрыть нули</span>
                 </label>
             </div>
 
@@ -65,29 +72,116 @@
             </div>
         </main>
 
-        <!-- Навигация -->
+        <!-- Нижняя навигация -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item active" onclick="setActive(this)">
+            <a href="#home" class="nav-item active" onclick="showPage('home')">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </a>
-            <a href="#" class="nav-item" onclick="setActive(this)">
+            <a href="#exchange" class="nav-item" onclick="showPage('exchange')">
                 <i class="fas fa-exchange-alt"></i>
                 <span>Обмен</span>
             </a>
-            <a href="#" class="nav-item" onclick="setActive(this)">
+            <a href="#qr" class="nav-item" onclick="showPage('qr')">
                 <i class="fas fa-qrcode"></i>
                 <span>QR</span>
             </a>
-            <a href="#" class="nav-item" onclick="setActive(this)">
+            <a href="#history" class="nav-item" onclick="showPage('history')">
                 <i class="fas fa-history"></i>
                 <span>История</span>
             </a>
-            <a href="#" class="nav-item" onclick="setActive(this)">
+            <a href="#profile" class="nav-item" onclick="showPage('profile')">
                 <i class="fas fa-user"></i>
                 <span>Профиль</span>
             </a>
         </nav>
+
+        <!-- Страница профиля (скрыта по умолчанию) -->
+        <div id="profilePage" class="page hidden">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('home')">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2><i class="fas fa-user-cog"></i> Профиль</h2>
+            </div>
+            
+            <div class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h3>Игрок Sandbox</h3>
+                        <p>ID: CRYPTO-<span id="userId">001</span></p>
+                    </div>
+                </div>
+                
+                <div class="sandbox-section">
+                    <h3><i class="fas fa-gamepad"></i> Песочница</h3>
+                    <p class="sandbox-description">Добавьте тестовые деньги для экспериментов</p>
+                    
+                    <div class="money-buttons">
+                        <button class="money-btn" onclick="addMoney(10)">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>+ $10</span>
+                            <small>Быстрая сумма</small>
+                        </button>
+                        <button class="money-btn" onclick="addMoney(50)">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>+ $50</span>
+                            <small>Средняя сумма</small>
+                        </button>
+                        <button class="money-btn" onclick="addMoney(100)">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>+ $100</span>
+                            <small>Крупная сумма</small>
+                        </button>
+                        <button class="money-btn" onclick="addMoney(500)">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>+ $500</span>
+                            <small>Максимум</small>
+                        </button>
+                    </div>
+                    
+                    <div class="custom-amount">
+                        <input type="number" id="customAmount" placeholder="Введите сумму" min="1" max="10000">
+                        <button class="custom-btn" onclick="addCustomMoney()">
+                            <i class="fas fa-plus"></i> Добавить
+                        </button>
+                    </div>
+                    
+                    <div class="sandbox-actions">
+                        <button class="action-btn secondary" onclick="resetBalance()">
+                            <i class="fas fa-redo"></i> Сбросить баланс
+                        </button>
+                        <button class="action-btn secondary" onclick="simulateTrade()">
+                            <i class="fas fa-dice"></i> Случайная сделка
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="transaction-history">
+                    <h3><i class="fas fa-list-alt"></i> История операций</h3>
+                    <div class="history-list" id="historyList">
+                        <!-- История генерируется через JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-plus-circle"></i> Пополнение</h3>
+            <p>Выберите способ пополнения:</p>
+            <div class="modal-buttons">
+                <button class="modal-btn"><i class="fab fa-bitcoin"></i> Bitcoin</button>
+                <button class="modal-btn"><i class="fas fa-coins"></i> Tether (USDT)</button>
+                <button class="modal-btn"><i class="fab fa-telegram"></i> Toncoin</button>
+            </div>
+            <button class="close-modal" onclick="closeModal()">Закрыть</button>
+        </div>
     </div>
 
     <script src="app.js"></script>
