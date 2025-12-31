@@ -1,286 +1,279 @@
 // Данные приложения
 const appData = {
-    totalBalance: 4059.61,
+    balance: 4759.61,
     assets: [
-        { 
-            name: "Tether", 
-            symbol: "USDT", 
-            balance: 4059.61, 
-            price: 0.998, 
-            change: -0.05, 
-            color: "#26a17a", 
-            icon: "fa-dollar-sign" 
+        {
+            id: 1,
+            name: "Tether",
+            symbol: "USDT",
+            balance: 4759.61,
+            price: 0.998,
+            change: -0.05,
+            icon: "💵",
+            color: "#26a17a"
         },
-        { 
-            name: "Toncoin", 
-            symbol: "TON", 
-            balance: 0, 
-            price: 1.64, 
-            change: 0.84, 
-            color: "#0088cc", 
-            icon: "fa-telegram" 
+        {
+            id: 2,
+            name: "Toncoin",
+            symbol: "TON",
+            balance: 0,
+            price: 1.64,
+            change: 0.84,
+            icon: "🔹",
+            color: "#0088cc"
         },
-        { 
-            name: "Solana", 
-            symbol: "SOL", 
-            balance: 0, 
-            price: 0, 
-            change: 0, 
-            color: "#00ffa3", 
-            icon: "fa-fire" 
+        {
+            id: 3,
+            name: "Solana",
+            symbol: "SOL",
+            balance: 0,
+            price: 0,
+            change: 0,
+            icon: "🔥",
+            color: "#00ffa3"
         },
-        { 
-            name: "USDTo", 
-            symbol: "USDTo", 
-            balance: 0, 
-            price: 0, 
-            change: 0, 
-            color: "#5a67d8", 
-            icon: "fa-coins" 
+        {
+            id: 4,
+            name: "USDTo",
+            symbol: "USDTo",
+            balance: 0,
+            price: 0,
+            change: 0,
+            icon: "💎",
+            color: "#5a67d8"
         },
-        { 
-            name: "TON", 
-            symbol: "TON", 
-            balance: 0, 
-            price: 0, 
-            change: 0, 
-            color: "#0088cc", 
-            icon: "fa-telegram" 
+        {
+            id: 5,
+            name: "TON",
+            symbol: "TON",
+            balance: 0,
+            price: 0,
+            change: 0,
+            icon: "🔹",
+            color: "#0088cc"
         },
-        { 
-            name: "SOL", 
-            symbol: "SOL", 
-            balance: 0, 
-            price: 0, 
-            change: 0, 
-            color: "#00ffa3", 
-            icon: "fa-fire" 
+        {
+            id: 6,
+            name: "SOL",
+            symbol: "SOL",
+            balance: 0,
+            price: 0,
+            change: 0,
+            icon: "🔥",
+            color: "#00ffa3"
         }
-    ],
-    userId: "001",
-    history: []
+    ]
 };
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
     initApp();
+    loadAssets();
+    setupTelegram();
 });
 
+// Основная инициализация
 function initApp() {
-    renderAssets();
-    initToggle();
-    updateHistory();
-    
-    // Устанавливаем ID пользователя
-    document.getElementById('userId').textContent = appData.userId;
-    
-    // Добавляем начальные записи в историю
-    addToHistory("Начальный баланс", 4059.61, true);
-    addToHistory("Бонус за регистрацию", 50, true);
+    // Настройка переключателя
+    const toggle = document.getElementById('hideZeroBalances');
+    if (toggle) {
+        toggle.addEventListener('change', function() {
+            const items = document.querySelectorAll('.asset-item');
+            items.forEach(item => {
+                const balanceText = item.querySelector('.asset-balance').textContent;
+                const balanceValue = parseFloat(balanceText);
+                if (balanceValue === 0 && this.checked) {
+                    item.style.display = 'none';
+                } else {
+                    item.style.display = 'flex';
+                }
+            });
+        });
+    }
+
+    // Настройка навигации
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            navItems.forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+            const page = this.getAttribute('data-page');
+            showPage(page);
+        });
+    });
+
+    // Автообновление баланса
+    startAutoUpdate();
 }
 
-// Рендеринг активов
-function renderAssets() {
+// Загрузка активов
+function loadAssets() {
     const container = document.getElementById('assetsList');
     container.innerHTML = '';
-    
+
     appData.assets.forEach(asset => {
-        const div = document.createElement('div');
-        div.className = 'asset-item';
-        div.innerHTML = `
-            <div class="asset-icon" style="background-color: ${asset.color};">
-                <i class="fas ${asset.icon}"></i>
-            </div>
-            <div class="asset-info">
-                <div class="asset-name-row">
-                    <span class="asset-name">${asset.name}</span>
-                    <span class="asset-balance">${formatNumber(asset.balance)} ${asset.symbol}</span>
-                </div>
-                <div class="asset-price-row">
-                    <span class="asset-price">$${asset.price.toFixed(3)}</span>
-                    ${asset.change !== 0 ? 
-                        `<span class="asset-change ${asset.change > 0 ? 'positive' : 'negative'}">
-                            ${asset.change > 0 ? '+' : ''}${asset.change}%
-                        </span>` : 
-                        '<span></span>'
-                    }
-                </div>
-            </div>
-        `;
-        container.appendChild(div);
+        const assetElement = createAssetElement(asset);
+        container.appendChild(assetElement);
     });
+}
+
+// Создание элемента актива
+function createAssetElement(asset) {
+    const div = document.createElement('div');
+    div.className = 'asset-item';
+    div.dataset.id = asset.id;
+
+    const changeClass = asset.change > 0 ? 'change-positive' : 'change-negative';
+    const changeSign = asset.change > 0 ? '+' : '';
+    const changeText = asset.change !== 0 ? `${changeSign}${asset.change}%` : '';
+
+    div.innerHTML = `
+        <div class="asset-icon" style="background: ${asset.color}20; color: ${asset.color}">
+            ${asset.icon}
+        </div>
+        <div class="asset-info">
+            <div class="asset-name-row">
+                <div class="asset-name">${asset.name}</div>
+                <div class="asset-balance">${formatNumber(asset.balance)} ${asset.symbol}</div>
+            </div>
+            <div class="asset-price-row">
+                <div class="asset-price">$${asset.price.toFixed(asset.price === 0 ? 0 : 3)}</div>
+                ${asset.change !== 0 ? 
+                    `<div class="asset-change ${changeClass}">${changeText}</div>` : 
+                    '<div></div>'
+                }
+            </div>
+        </div>
+    `;
+
+    // Добавляем обработчик клика
+    div.addEventListener('click', () => selectAsset(asset.id));
+
+    return div;
 }
 
 // Форматирование чисел
 function formatNumber(num) {
     if (num === 0) return '0';
     if (num < 0.01) return num.toFixed(4);
-    return num.toLocaleString('en-US', { 
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2 
+    return num.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
     });
 }
 
-// Переключатель
-function initToggle() {
-    document.getElementById('hideSmallBalances').addEventListener('change', function() {
-        const items = document.querySelectorAll('.asset-item');
-        items.forEach(item => {
-            const balanceText = item.querySelector('.asset-balance').textContent;
-            const balanceValue = parseFloat(balanceText);
-            if (balanceValue === 0 && this.checked) {
-                item.style.display = 'none';
-            } else {
-                item.style.display = 'flex';
-            }
+// Интеграция с Telegram WebApp
+function setupTelegram() {
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        
+        // Расширяем на весь экран
+        tg.expand();
+        
+        // Настраиваем кнопку
+        tg.MainButton.setText("Обновить баланс");
+        tg.MainButton.onClick(() => {
+            updateBalance();
+            tg.showAlert("Баланс обновлен!");
         });
-    });
-}
-
-// Навигация
-function showPage(page) {
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => item.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    
-    if (page === 'profile') {
-        document.getElementById('profilePage').classList.remove('hidden');
-        document.querySelector('.header').style.display = 'none';
-        document.querySelector('.banner').style.display = 'none';
-        document.querySelector('.assets-section').style.display = 'none';
-    } else if (page === 'home') {
-        document.getElementById('profilePage').classList.add('hidden');
-        document.querySelector('.header').style.display = 'block';
-        document.querySelector('.banner').style.display = 'block';
-        document.querySelector('.assets-section').style.display = 'block';
+        tg.MainButton.show();
+        
+        // Отправляем данные
+        tg.sendData(JSON.stringify({
+            action: "init",
+            balance: appData.balance
+        }));
+        
+        // Слушаем сообщения от бота
+        tg.onEvent('viewportChanged', () => {
+            tg.expand();
+        });
     }
 }
 
-// Добавление денег
-function addMoney(amount) {
-    const oldBalance = appData.totalBalance;
-    appData.totalBalance += amount;
+// Обновление баланса
+function updateBalance() {
+    // Случайное изменение баланса ±$50
+    const change = (Math.random() - 0.5) * 100;
+    const oldBalance = appData.balance;
+    appData.balance += change;
     
     // Обновляем USDT баланс
-    appData.assets[0].balance = appData.totalBalance;
+    appData.assets[0].balance = appData.balance;
+    appData.assets[0].change = change > 0 ? 0.05 : -0.05;
     
     // Обновляем отображение
-    updateBalanceDisplay();
-    renderAssets();
+    document.getElementById('totalBalance').textContent = `$${formatNumber(appData.balance)}`;
+    loadAssets();
     
-    // Добавляем в историю
-    addToHistory(`Добавлено +$${amount}`, amount, true);
-    
-    // Показываем уведомление
-    showNotification(`+$${amount} добавлено к балансу!`);
-}
-
-// Добавление кастомной суммы
-function addCustomMoney() {
-    const input = document.getElementById('customAmount');
-    const amount = parseFloat(input.value);
-    
-    if (!amount || amount <= 0 || amount > 10000) {
-        alert('Введите сумму от $1 до $10,000');
-        return;
+    // Отправляем в Telegram
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.sendData(JSON.stringify({
+            action: "balance_update",
+            oldBalance: oldBalance,
+            newBalance: appData.balance,
+            change: change
+        }));
     }
     
-    addMoney(amount);
-    input.value = '';
+    showNotification(`Баланс ${change > 0 ? 'увеличился' : 'уменьшился'} на $${Math.abs(change).toFixed(2)}`);
 }
 
-// Обновление отображения баланса
-function updateBalanceDisplay() {
-    document.getElementById('totalBalance').textContent = `$${formatNumber(appData.totalBalance)}`;
+// Автообновление
+function startAutoUpdate() {
+    // Обновляем каждые 30 секунд
+    setInterval(updateBalance, 30000);
 }
 
-// Сброс баланса
-function resetBalance() {
-    if (!confirm('Сбросить баланс к начальному значению $4,059.61?')) {
-        return;
+// Показ страниц
+function showPage(page) {
+    switch(page) {
+        case 'home':
+            // Уже открыта
+            break;
+        case 'exchange':
+            alert("Функция обмена в разработке");
+            break;
+        case 'qr':
+            alert("QR-код: https://2no.co/cryptobotrnyprofile");
+            break;
+        case 'history':
+            alert("История транзакций будет здесь");
+            break;
+        case 'profile':
+            alert("Профиль пользователя");
+            break;
     }
-    
-    appData.totalBalance = 4059.61;
-    appData.assets[0].balance = 4059.61;
-    
-    // Сбрасываем остальные активы
-    for (let i = 1; i < appData.assets.length; i++) {
-        appData.assets[i].balance = 0;
+}
+
+// Выбор актива
+function selectAsset(id) {
+    const asset = appData.assets.find(a => a.id === id);
+    if (asset) {
+        alert(`${asset.name} (${asset.symbol})\nБаланс: ${formatNumber(asset.balance)}\nЦена: $${asset.price}`);
     }
-    
-    updateBalanceDisplay();
-    renderAssets();
-    addToHistory("Сброс баланса", 0, false);
-    showNotification("Баланс сброшен!");
 }
 
-// Случайная сделка
-function randomTrade() {
-    const types = ['Покупка BTC', 'Продажа ETH', 'Обмен TON', 'Торговля SOL'];
-    const type = types[Math.floor(Math.random() * types.length)];
-    const amount = (Math.random() * 500 - 250).toFixed(2);
-    const isPositive = parseFloat(amount) > 0;
-    
-    appData.totalBalance += parseFloat(amount);
-    appData.assets[0].balance = appData.totalBalance;
-    
-    updateBalanceDisplay();
-    renderAssets();
-    addToHistory(type, Math.abs(parseFloat(amount)), isPositive);
-    
-    const message = isPositive 
-        ? `Прибыль: +$${amount}`
-        : `Убыток: -$${Math.abs(parseFloat(amount))}`;
-    showNotification(`${type} - ${message}`);
+// Функции кнопок
+function showDeposit() {
+    alert("Пополнение баланса:\n\n1. Выберите криптовалюту\n2. Укажите сумму\n3. Отправьте на адрес кошелька");
 }
 
-// История операций
-function addToHistory(description, amount, isPositive) {
-    const transaction = {
-        id: Date.now(),
-        description,
-        amount,
-        isPositive,
-        time: new Date().toLocaleTimeString('ru-RU', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        }),
-        date: new Date().toLocaleDateString('ru-RU')
-    };
-    
-    appData.history.unshift(transaction);
-    
-    // Ограничиваем историю 10 записями
-    if (appData.history.length > 10) {
-        appData.history.pop();
-    }
-    
-    updateHistory();
+function showWithdraw() {
+    alert("Вывод средств:\n\n1. Введите адрес кошелька\n2. Укажите сумму\n3. Подтвердите транзакцию");
 }
 
-function updateHistory() {
-    const container = document.getElementById('historyList');
-    container.innerHTML = '';
-    
-    appData.history.forEach(transaction => {
-        const div = document.createElement('div');
-        div.className = `history-item ${transaction.isPositive ? 'positive' : 'negative'}`;
-        div.innerHTML = `
-            <div class="history-title">${transaction.description}</div>
-            <div class="history-details">
-                <span>${transaction.time} ${transaction.date}</span>
-                <span class="history-amount ${transaction.isPositive ? '' : 'negative'}">
-                    ${transaction.isPositive ? '+' : '-'}$${Math.abs(transaction.amount).toFixed(2)}
-                </span>
-            </div>
-        `;
-        container.appendChild(div);
-    });
+function showExchange() {
+    alert("Обмен валют:\n\nДоступные пары:\n• USDT/TON\n• USDT/BTC\n• USDT/ETH\n• USDT/SOL");
+}
+
+function showMarket() {
+    alert("Биржевые торги:\n\n• BTC/USDT\n• ETH/USDT\n• TON/USDT\n• SOL/USDT");
 }
 
 // Уведомления
 function showNotification(message) {
-    // Создаем уведомление
+    // Создаем элемент уведомления
     const notification = document.createElement('div');
     notification.className = 'notification';
     notification.textContent = message;
@@ -290,11 +283,12 @@ function showNotification(message) {
         left: 50%;
         transform: translateX(-50%);
         background: #5288c1;
-        color: white;
-        padding: 15px 25px;
+        color: #f5f5f5;
+        padding: 12px 24px;
         border-radius: 12px;
         z-index: 3000;
-        box-shadow: 0 4px 12px rgba(82, 136, 193, 0.3);
+        font-weight: 500;
+        box-shadow: 0 4px 20px rgba(82, 136, 193, 0.3);
         animation: slideDown 0.3s ease;
     `;
     
@@ -311,7 +305,7 @@ function showNotification(message) {
     }, 3000);
 }
 
-// Добавляем стили для анимации
+// Добавляем стили анимации
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideDown {
@@ -324,20 +318,3 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-
-// Функции для кнопок
-function showDeposit() {
-    alert("Пополнение баланса\n\n1. Выберите криптовалюту\n2. Укажите сумму\n3. Отправьте на адрес кошелька");
-}
-
-function showWithdraw() {
-    alert("Вывод средств\n\n1. Введите адрес кошелька\n2. Укажите сумму\n3. Подтвердите вывод");
-}
-
-function showExchange() {
-    alert("Обмен валют\n\nДоступные пары:\n• USDT/TON\n• USDT/BTC\n• USDT/ETH");
-}
-
-function showMarket() {
-    alert("Биржевые торги\n\nРежим песочницы - все сделки виртуальные");
-}
