@@ -4,28 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Bot Clone</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f5f5f7; max-width: 500px; margin: 0 auto; padding-bottom: 80px; }
+        .app-container { background: white; min-height: 100vh; }
+        
+        /* Шапка */
+        .header { background: linear-gradient(135deg, #0088cc, #0055cc); color: white; padding: 20px 15px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .balance-display { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+        .balance-label { font-size: 14px; opacity: 0.9; margin-bottom: 5px; }
+        .balance-amount { font-size: 36px; font-weight: bold; }
+        .actions { display: flex; justify-content: space-between; gap: 10px; }
+        .action-btn { flex: 1; background: rgba(255,255,255,0.2); border: none; color: white; padding: 12px 5px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .action-btn:hover { background: rgba(255,255,255,0.3); }
+        .action-btn i { font-size: 20px; }
+        
+        /* Баннер */
+        .banner { background: linear-gradient(90deg, #ff6b6b, #ff8e53); margin: 20px 15px; border-radius: 16px; padding: 15px; color: white; }
+        .banner-content { display: flex; align-items: center; gap: 15px; }
+        .banner-icon { font-size: 30px; }
+        
+        /* Активы */
+        .assets-section { padding: 0 15px; }
+        .assets-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .assets-header h2 { font-size: 22px; font-weight: 700; }
+        .toggle-small { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: #666; }
+        .toggle-slider { position: relative; width: 40px; height: 20px; background: #ccc; border-radius: 20px; }
+        .toggle-slider:after { content: ''; position: absolute; width: 18px; height: 18px; background: white; border-radius: 50%; top: 1px; left: 1px; transition: transform 0.3s; }
+        #hideSmallBalances:checked + .toggle-slider { background: #0088cc; }
+        #hideSmallBalances:checked + .toggle-slider:after { transform: translateX(20px); }
+        #hideSmallBalances { display: none; }
+        .assets-list { display: flex; flex-direction: column; gap: 15px; }
+        .asset-item { display: flex; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 16px; }
+        .asset-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-right: 15px; }
+        .asset-info { flex: 1; }
+        .asset-name-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .asset-name { font-weight: 600; font-size: 16px; }
+        .asset-balance { font-weight: 600; font-size: 16px; }
+        .asset-price-row { display: flex; justify-content: space-between; font-size: 14px; color: #666; }
+        .positive { color: #26a17a; }
+        .negative { color: #ff6b6b; }
+        
+        /* Навигация */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #999; font-size: 12px; }
+        .nav-item.active { color: #0088cc; }
+        .nav-item i { font-size: 22px; margin-bottom: 4px; }
+        
+        /* Telegram UI */
+        .telegram-panel { position: fixed; top: 0; left: 0; right: 0; background: #0088cc; color: white; padding: 10px 15px; display: none; z-index: 1000; }
+        .tg-close { float: right; background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+    </style>
 </head>
 <body>
+    <!-- Telegram WebApp панель -->
+    <div id="telegramPanel" class="telegram-panel">
+        <span>Crypto Bot</span>
+        <button class="tg-close" onclick="closeTelegramPanel()">×</button>
+    </div>
+
     <div class="app-container">
-        <!-- Верхняя панель -->
+        <!-- Шапка -->
         <header class="header">
             <div class="balance-display">
                 <span class="balance-label">Общий баланс в USD</span>
                 <span class="balance-amount" id="totalBalance">$4059.61</span>
             </div>
             <div class="actions">
-                <button class="action-btn" id="depositBtn">
+                <button class="action-btn" onclick="showDeposit()">
                     <i class="fas fa-plus-circle"></i> Пополнить
                 </button>
-                <button class="action-btn" id="withdrawBtn">
+                <button class="action-btn" onclick="showWithdraw()">
                     <i class="fas fa-arrow-up"></i> Вывести
                 </button>
-                <button class="action-btn" id="exchangeBtn">
+                <button class="action-btn" onclick="showExchange()">
                     <i class="fas fa-exchange-alt"></i> Обмен
                 </button>
-                <button class="action-btn" id="marketBtn">
+                <button class="action-btn" onclick="showMarket()">
                     <i class="fas fa-chart-line"></i> Биржа
                 </button>
             </div>
@@ -42,7 +98,7 @@
             </div>
         </div>
 
-        <!-- Список активов -->
+        <!-- Активы -->
         <main class="assets-section">
             <div class="assets-header">
                 <h2>Активы</h2>
@@ -53,141 +109,172 @@
                 </label>
             </div>
 
-            <div class="assets-list">
-                <!-- Актив 1 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #26a17a;">
-                        <i class="fab fa-usd"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">Tether</span>
-                            <span class="asset-balance">4059.61 USDT</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.998</span>
-                            <span class="asset-change negative">-0.05%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 2 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #0088cc;">
-                        <i class="fab fa-telegram"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">Toncoin</span>
-                            <span class="asset-balance">0 TON</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$1.64</span>
-                            <span class="asset-change positive">+0.84%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 3 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #00ffa3;">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">Solana</span>
-                            <span class="asset-balance">0 SOL</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 4 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #5a67d8;">
-                        <i class="fas fa-coins"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">USDTo</span>
-                            <span class="asset-balance">0 USDTo</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 5 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #0088cc;">
-                        <i class="fab fa-telegram"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">TON</span>
-                            <span class="asset-balance">0 TON</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 6 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #00ffa3;">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">SOL</span>
-                            <span class="asset-balance">0 SOL</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="assets-list" id="assetsList">
+                <!-- Активы генерируются через JS -->
             </div>
         </main>
 
-        <!-- Нижняя навигация -->
+        <!-- Навигация -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item active">
+            <a href="#" class="nav-item active" onclick="setActive(this)">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="setActive(this)">
                 <i class="fas fa-exchange-alt"></i>
                 <span>Обмен</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="setActive(this)">
                 <i class="fas fa-qrcode"></i>
                 <span>QR</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="setActive(this)">
                 <i class="fas fa-history"></i>
                 <span>История</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="setActive(this)">
                 <i class="fas fa-user"></i>
                 <span>Профиль</span>
             </a>
         </nav>
     </div>
 
-    <!-- Модальные окна (скрыты) -->
-    <div id="depositModal" class="modal">
-        <div class="modal-content">
-            <h3>Пополнение</h3>
-            <p>Интерфейс пополнения (симуляция)</p>
-            <button class="close-modal">Закрыть</button>
-        </div>
-    </div>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script src="script.js"></script>
+    <script>
+        // Данные приложения
+        const userBalance = {
+            total: 4059.61,
+            assets: [
+                { name: "Tether", symbol: "USDT", balance: 4059.61, price: 0.998, change: -0.05, color: "#26a17a", icon: "fa-dollar-sign" },
+                { name: "Toncoin", symbol: "TON", balance: 0, price: 1.64, change: 0.84, color: "#0088cc", icon: "fa-telegram" },
+                { name: "Solana", symbol: "SOL", balance: 0, price: 0, change: 0, color: "#00ffa3", icon: "fa-fire" },
+                { name: "USDTo", symbol: "USDTo", balance: 0, price: 0, change: 0, color: "#5a67d8", icon: "fa-coins" },
+                { name: "TON", symbol: "TON", balance: 0, price: 0, change: 0, color: "#0088cc", icon: "fa-telegram" },
+                { name: "SOL", symbol: "SOL", balance: 0, price: 0, change: 0, color: "#00ffa3", icon: "fa-fire" }
+            ]
+        };
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAssets();
+            initTelegramWebApp();
+            initToggle();
+        });
+
+        // Рендер активов
+        function renderAssets() {
+            const container = document.getElementById('assetsList');
+            container.innerHTML = '';
+            
+            userBalance.assets.forEach(asset => {
+                const div = document.createElement('div');
+                div.className = 'asset-item';
+                div.innerHTML = `
+                    <div class="asset-icon" style="background-color: ${asset.color};">
+                        <i class="fas ${asset.icon}"></i>
+                    </div>
+                    <div class="asset-info">
+                        <div class="asset-name-row">
+                            <span class="asset-name">${asset.name}</span>
+                            <span class="asset-balance">${asset.balance} ${asset.symbol}</span>
+                        </div>
+                        <div class="asset-price-row">
+                            <span class="asset-price">$${asset.price.toFixed(asset.price === 0 ? 0 : 3)}</span>
+                            ${asset.change !== 0 ? 
+                                `<span class="asset-change ${asset.change > 0 ? 'positive' : 'negative'}">
+                                    ${asset.change > 0 ? '+' : ''}${asset.change}%
+                                </span>` : 
+                                '<span></span>'
+                            }
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Telegram WebApp интеграция
+        function initTelegramWebApp() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                document.getElementById('telegramPanel').style.display = 'block';
+                tg.expand();
+                tg.MainButton.setText("Открыть в боте").show();
+                tg.MainButton.onClick(() => tg.openTelegramLink('https://t.me/cryptobot'));
+                
+                // Отправляем данные в бота
+                tg.sendData(JSON.stringify({action: "balance", value: userBalance.total}));
+            }
+        }
+
+        function closeTelegramPanel() {
+            document.getElementById('telegramPanel').style.display = 'none';
+        }
+
+        // Переключатель
+        function initToggle() {
+            document.getElementById('hideSmallBalances').addEventListener('change', function() {
+                const items = document.querySelectorAll('.asset-item');
+                items.forEach(item => {
+                    const balanceText = item.querySelector('.asset-balance').textContent;
+                    const balanceValue = parseFloat(balanceText);
+                    if (balanceValue === 0 && this.checked) {
+                        item.style.display = 'none';
+                    } else {
+                        item.style.display = 'flex';
+                    }
+                });
+            });
+        }
+
+        // Навигация
+        function setActive(element) {
+            event.preventDefault();
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Действия кнопок
+        function showDeposit() {
+            alert("Симуляция: Открыт интерфейс пополнения\n\n1. Выберите криптовалюту\n2. Укажите сумму\n3. Отправьте на адрес кошелька");
+        }
+
+        function showWithdraw() {
+            alert("Симуляция: Вывод средств\n\n1. Введите адрес кошелька\n2. Укажите сумму\n3. Подтвердите транзакцию");
+        }
+
+        function showExchange() {
+            alert("Симуляция: Обмен валют\n\n1. Выберите пару (USDT/TON)\n2. Введите сумму\n3. Подтвердите обмен");
+        }
+
+        function showMarket() {
+            alert("Симуляция: Биржа\n\nДоступны графики:\n- BTC/USDT\n- TON/USDT\n- SOL/USDT");
+        }
+
+        // Обновление баланса (симуляция API)
+        function updateBalance() {
+            // Случайное изменение баланса ±$10
+            const change = (Math.random() - 0.5) * 20;
+            userBalance.total += change;
+            document.getElementById('totalBalance').textContent = `$${userBalance.total.toFixed(2)}`;
+            
+            // Обновляем USDT баланс
+            userBalance.assets[0].balance = userBalance.total;
+            renderAssets();
+            
+            // Симуляция обновления в Telegram
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({
+                    action: "update",
+                    balance: userBalance.total
+                }));
+            }
+        }
+
+        // Автообновление каждые 30 секунд
+        setInterval(updateBalance, 30000);
+    </script>
 </body>
 </html>
