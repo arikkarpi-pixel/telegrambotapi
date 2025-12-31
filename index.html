@@ -4,28 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Bot Clone</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Telegram WebApp панель -->
+    <div id="telegramPanel" class="telegram-panel">
+        <span>Crypto Bot</span>
+        <button class="tg-close" onclick="closeTelegramPanel()">×</button>
+    </div>
+
     <div class="app-container">
-        <!-- Верхняя панель -->
+        <!-- Шапка -->
         <header class="header">
             <div class="balance-display">
                 <span class="balance-label">Общий баланс в USD</span>
                 <span class="balance-amount" id="totalBalance">$4059.61</span>
             </div>
             <div class="actions">
-                <button class="action-btn" id="depositBtn">
+                <button class="action-btn" onclick="showDeposit()">
                     <i class="fas fa-plus-circle"></i> Пополнить
                 </button>
-                <button class="action-btn" id="withdrawBtn">
+                <button class="action-btn" onclick="showWithdraw()">
                     <i class="fas fa-arrow-up"></i> Вывести
                 </button>
-                <button class="action-btn" id="exchangeBtn">
+                <button class="action-btn" onclick="showExchange()">
                     <i class="fas fa-exchange-alt"></i> Обмен
                 </button>
-                <button class="action-btn" id="marketBtn">
+                <button class="action-btn" onclick="showMarket()">
                     <i class="fas fa-chart-line"></i> Биржа
                 </button>
             </div>
@@ -42,7 +49,7 @@
             </div>
         </div>
 
-        <!-- Список активов -->
+        <!-- Активы -->
         <main class="assets-section">
             <div class="assets-header">
                 <h2>Активы</h2>
@@ -53,141 +60,36 @@
                 </label>
             </div>
 
-            <div class="assets-list">
-                <!-- Актив 1 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #26a17a;">
-                        <i class="fab fa-usd"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">Tether</span>
-                            <span class="asset-balance">4059.61 USDT</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.998</span>
-                            <span class="asset-change negative">-0.05%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 2 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #0088cc;">
-                        <i class="fab fa-telegram"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">Toncoin</span>
-                            <span class="asset-balance">0 TON</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$1.64</span>
-                            <span class="asset-change positive">+0.84%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 3 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #00ffa3;">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">Solana</span>
-                            <span class="asset-balance">0 SOL</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 4 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #5a67d8;">
-                        <i class="fas fa-coins"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">USDTo</span>
-                            <span class="asset-balance">0 USDTo</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 5 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #0088cc;">
-                        <i class="fab fa-telegram"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">TON</span>
-                            <span class="asset-balance">0 TON</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Актив 6 -->
-                <div class="asset-item">
-                    <div class="asset-icon" style="background-color: #00ffa3;">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="asset-info">
-                        <div class="asset-name-row">
-                            <span class="asset-name">SOL</span>
-                            <span class="asset-balance">0 SOL</span>
-                        </div>
-                        <div class="asset-price-row">
-                            <span class="asset-price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="assets-list" id="assetsList">
+                <!-- Активы генерируются через JS -->
             </div>
         </main>
 
-        <!-- Нижняя навигация -->
+        <!-- Навигация -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item active">
+            <a href="#" class="nav-item active" onclick="setActive(this)">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="setActive(this)">
                 <i class="fas fa-exchange-alt"></i>
                 <span>Обмен</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="setActive(this)">
                 <i class="fas fa-qrcode"></i>
                 <span>QR</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="setActive(this)">
                 <i class="fas fa-history"></i>
                 <span>История</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="setActive(this)">
                 <i class="fas fa-user"></i>
                 <span>Профиль</span>
             </a>
         </nav>
     </div>
 
-    <!-- Модальные окна (скрыты) -->
-    <div id="depositModal" class="modal">
-        <div class="modal-content">
-            <h3>Пополнение</h3>
-            <p>Интерфейс пополнения (симуляция)</p>
-            <button class="close-modal">Закрыть</button>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
