@@ -3,153 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Bot Clone</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <title>Crypto Bot</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <!-- Шапка с балансом -->
-        <header class="header">
-            <div class="balance-display">
-                <span class="balance-label">Общий баланс в USD</span>
-                <span class="balance-amount" id="totalBalance">$4,059.61</span>
+        <!-- Шапка -->
+        <div class="header">
+            <div class="balance-section">
+                <div class="balance-label">Общий баланс в USD</div>
+                <div class="balance-amount" id="totalBalance">$4,759.61</div>
             </div>
-            <div class="actions">
+            <div class="action-buttons">
                 <button class="action-btn" onclick="showDeposit()">
-                    <i class="fas fa-plus-circle"></i> Пополнить
+                    <div class="btn-icon">💳</div>
+                    <div class="btn-text">Пополнить</div>
                 </button>
                 <button class="action-btn" onclick="showWithdraw()">
-                    <i class="fas fa-arrow-up"></i> Вывести
+                    <div class="btn-icon">📤</div>
+                    <div class="btn-text">Вывести</div>
                 </button>
                 <button class="action-btn" onclick="showExchange()">
-                    <i class="fas fa-exchange-alt"></i> Обмен
+                    <div class="btn-icon">🔄</div>
+                    <div class="btn-text">Обмен</div>
                 </button>
                 <button class="action-btn" onclick="showMarket()">
-                    <i class="fas fa-chart-line"></i> Биржа
+                    <div class="btn-icon">📈</div>
+                    <div class="btn-text">Биржа</div>
                 </button>
             </div>
-        </header>
+        </div>
 
         <!-- Баннер -->
         <div class="banner">
+            <div class="banner-icon">🎁</div>
             <div class="banner-content">
-                <i class="fas fa-gift banner-icon"></i>
-                <div class="banner-text">
-                    <strong>Новый год с Crypto Bot</strong>
-                    <p>Криптовалютные подарки всем активным пользователям!</p>
-                </div>
+                <div class="banner-title">Новый год с Crypto Bot</div>
+                <div class="banner-description">Криптовалютные подарки всем активным пользователям!</div>
             </div>
         </div>
 
         <!-- Активы -->
-        <main class="assets-section">
-            <div class="assets-header">
-                <h2>Активы</h2>
-                <label class="toggle-small">
-                    <input type="checkbox" id="hideSmallBalances">
+        <div class="assets-section">
+            <div class="section-header">
+                <div class="section-title">Активы</div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="hideZeroBalances">
                     <span class="toggle-slider"></span>
-                    <span class="toggle-text">Скрыть мелкие балансы</span>
+                    <span class="toggle-label">Скрыть нули</span>
                 </label>
             </div>
-
+            
             <div class="assets-list" id="assetsList">
-                <!-- Активы генерируются через JS -->
+                <!-- Активы загружаются через JS -->
             </div>
-        </main>
+        </div>
 
-        <!-- Нижняя навигация -->
-        <nav class="bottom-nav">
-            <a href="#" class="nav-item active" onclick="showPage('home')">
-                <i class="fas fa-home"></i>
-                <span>Главная</span>
+        <!-- Навигация -->
+        <div class="bottom-nav">
+            <a class="nav-item active" data-page="home">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Главная</div>
             </a>
-            <a href="#" class="nav-item" onclick="showPage('exchange')">
-                <i class="fas fa-exchange-alt"></i>
-                <span>Обмен</span>
+            <a class="nav-item" data-page="exchange">
+                <div class="nav-icon">🔄</div>
+                <div class="nav-label">Обмен</div>
             </a>
-            <a href="#" class="nav-item" onclick="showPage('qr')">
-                <i class="fas fa-qrcode"></i>
-                <span>QR</span>
+            <a class="nav-item" data-page="qr">
+                <div class="nav-icon">📷</div>
+                <div class="nav-label">QR</div>
             </a>
-            <a href="#" class="nav-item" onclick="showPage('history')">
-                <i class="fas fa-history"></i>
-                <span>История</span>
+            <a class="nav-item" data-page="history">
+                <div class="nav-icon">📜</div>
+                <div class="nav-label">История</div>
             </a>
-            <a href="#" class="nav-item" onclick="showPage('profile')">
-                <i class="fas fa-user"></i>
-                <span>Профиль</span>
+            <a class="nav-item" data-page="profile">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Профиль</div>
             </a>
-        </nav>
-
-        <!-- Страница профиля (скрыта) -->
-        <div id="profilePage" class="profile-page hidden">
-            <div class="profile-header">
-                <button class="back-btn" onclick="showPage('home')">
-                    <i class="fas fa-arrow-left"></i> Назад
-                </button>
-                <h2>Профиль</h2>
-            </div>
-
-            <div class="profile-content">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="user-details">
-                        <h3>Игрок Crypto</h3>
-                        <p>ID: USER-<span id="userId">001</span></p>
-                    </div>
-                </div>
-
-                <div class="sandbox-section">
-                    <h3><i class="fas fa-gamepad"></i> Песочница</h3>
-                    <p class="sandbox-desc">Добавляйте тестовые деньги для экспериментов</p>
-                    
-                    <div class="money-grid">
-                        <button class="money-btn" onclick="addMoney(10)">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>+ $10</span>
-                        </button>
-                        <button class="money-btn" onclick="addMoney(50)">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>+ $50</span>
-                        </button>
-                        <button class="money-btn" onclick="addMoney(100)">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>+ $100</span>
-                        </button>
-                        <button class="money-btn" onclick="addMoney(500)">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>+ $500</span>
-                        </button>
-                    </div>
-
-                    <div class="custom-add">
-                        <input type="number" id="customAmount" placeholder="Введите сумму" min="1" max="10000">
-                        <button class="add-btn" onclick="addCustomMoney()">Добавить</button>
-                    </div>
-
-                    <div class="sandbox-buttons">
-                        <button class="sandbox-btn" onclick="resetBalance()">
-                            <i class="fas fa-redo"></i> Сбросить баланс
-                        </button>
-                        <button class="sandbox-btn" onclick="randomTrade()">
-                            <i class="fas fa-random"></i> Случайная сделка
-                        </button>
-                    </div>
-                </div>
-
-                <div class="history-section">
-                    <h3><i class="fas fa-history"></i> История операций</h3>
-                    <div class="history-list" id="historyList">
-                        <!-- История будет здесь -->
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
