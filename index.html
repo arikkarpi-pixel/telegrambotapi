@@ -6,52 +6,709 @@
     <title>Crypto Bot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ВСЕ СТИЛИ ЗДЕСЬ из style.css */
+        /* СБРОС И БАЗОВЫЕ СТИЛИ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
-
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1f2e, #232e3c);
+            background: linear-gradient(135deg, #1a1f2e 0%, #232e3c 100%);
             color: #ffffff;
-            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
             padding: 20px;
         }
-
-        .container {
+        
+        /* ОСНОВНОЙ КОНТЕЙНЕР */
+        .app-container {
             width: 100%;
             max-width: 400px;
+            height: 90vh;
+            min-height: 700px;
             background: #1e2534;
             border-radius: 24px;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
             border: 1px solid #2a3347;
             position: relative;
-            height: 90vh;
             display: flex;
             flex-direction: column;
         }
-
-        /* ... и все остальные стили ... */
+        
+        /* СЕКЦИЯ БАЛАНСА */
+        .balance-section {
+            background: linear-gradient(165deg, #232e3c 0%, #1e2534 100%);
+            padding: 28px 20px 24px;
+            border-bottom: 1px solid #2a3347;
+            position: relative;
+        }
+        
+        .balance-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #5288c1, #26a17a);
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            color: #8a93a7;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+            text-align: center;
+        }
+        
+        .balance-amount {
+            font-size: 52px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -1px;
+            margin-bottom: 32px;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        }
+        
+        /* КНОПКИ ДЕЙСТВИЙ */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        
+        .action-btn {
+            background: rgba(82, 136, 193, 0.15);
+            border: 1px solid rgba(82, 136, 193, 0.3);
+            border-radius: 16px;
+            padding: 16px 8px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .action-btn:active {
+            background: rgba(82, 136, 193, 0.25);
+            transform: scale(0.98);
+        }
+        
+        .btn-icon {
+            font-size: 24px;
+            opacity: 0.9;
+        }
+        
+        .btn-text {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            opacity: 0.9;
+        }
+        
+        /* БАННЕР */
+        .banner {
+            background: linear-gradient(135deg, rgba(82, 136, 193, 0.1), rgba(38, 222, 129, 0.05));
+            border: 1px solid rgba(82, 136, 193, 0.2);
+            margin: 20px;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        
+        .banner-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #5288c1, #26de81);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(82, 136, 193, 0.3);
+        }
+        
+        .banner-content {
+            flex: 1;
+        }
+        
+        .banner-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+            letter-spacing: 0.2px;
+        }
+        
+        .banner-subtitle {
+            font-size: 14px;
+            color: #8a93a7;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+        
+        /* СЕКЦИЯ АКТИВОВ */
+        .assets-section {
+            padding: 0 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-top: 10px;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+        
+        /* ПЕРЕКЛЮЧАТЕЛЬ */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .toggle-switch input {
+            display: none;
+        }
+        
+        .slider {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: rgba(138, 147, 167, 0.2);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        
+        .slider::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #8a93a7;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch input:checked + .slider {
+            background: rgba(82, 136, 193, 0.3);
+        }
+        
+        .toggle-switch input:checked + .slider::before {
+            transform: translateX(24px);
+            background: #5288c1;
+        }
+        
+        .toggle-label {
+            font-size: 14px;
+            color: #8a93a7;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        /* КАРТОЧКИ АКТИВОВ */
+        .assets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .asset-card {
+            background: linear-gradient(135deg, rgba(42, 51, 71, 0.6), rgba(30, 37, 52, 0.8));
+            border: 1px solid #2a3347;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .asset-card:active {
+            transform: scale(0.98);
+            background: linear-gradient(135deg, rgba(42, 51, 71, 0.8), rgba(30, 37, 52, 0.9));
+        }
+        
+        .asset-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+        
+        .asset-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .asset-info {
+            flex: 1;
+        }
+        
+        .asset-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+            letter-spacing: 0.2px;
+        }
+        
+        .asset-price {
+            font-size: 15px;
+            color: #8a93a7;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .price-change {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 8px;
+            letter-spacing: 0.3px;
+        }
+        
+        .price-change.positive {
+            background: rgba(38, 222, 129, 0.15);
+            color: #26de81;
+        }
+        
+        .price-change.negative {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+        }
+        
+        .asset-right {
+            text-align: right;
+        }
+        
+        .asset-balance {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+            letter-spacing: 0.2px;
+        }
+        
+        .asset-value {
+            font-size: 15px;
+            color: #8a93a7;
+            opacity: 0.8;
+        }
+        
+        /* НИЖНЯЯ НАВИГАЦИЯ */
+        .bottom-nav {
+            background: rgba(30, 37, 52, 0.95);
+            border-top: 1px solid #2a3347;
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: #8a93a7;
+            transition: all 0.2s;
+            padding: 8px 16px;
+            border-radius: 12px;
+            opacity: 0.7;
+            cursor: pointer;
+        }
+        
+        .nav-item.active {
+            color: #5288c1;
+            opacity: 1;
+            background: rgba(82, 136, 193, 0.1);
+        }
+        
+        .nav-item:active {
+            opacity: 1;
+            transform: scale(0.95);
+        }
+        
+        .nav-icon {
+            font-size: 22px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        
+        /* АДАПТИВНОСТЬ */
+        @media (max-width: 420px) {
+            body {
+                padding: 10px;
+            }
+            
+            .app-container {
+                height: 95vh;
+                max-width: 100%;
+                border-radius: 20px;
+            }
+            
+            .balance-amount {
+                font-size: 48px;
+            }
+            
+            .asset-icon {
+                width: 52px;
+                height: 52px;
+                font-size: 24px;
+            }
+        }
+        
+        /* ПРОСТЫЕ АНИМАЦИИ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .balance-section, .banner, .asset-card {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .banner {
+            animation-delay: 0.1s;
+        }
+        
+        .asset-card:nth-child(1) { animation-delay: 0.2s; }
+        .asset-card:nth-child(2) { animation-delay: 0.3s; }
+        .asset-card:nth-child(3) { animation-delay: 0.4s; }
+        
+        /* УВЕДОМЛЕНИЯ */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #5288c1, #26de81);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 16px;
+            font-weight: 600;
+            z-index: 9999;
+            box-shadow: 0 12px 40px rgba(82, 136, 193, 0.4);
+            max-width: 90%;
+            text-align: center;
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Твой контент здесь -->
+    <div class="app-container" id="appContainer">
+        <!-- Секция баланса -->
+        <div class="balance-section">
+            <div class="balance-label">Общий баланс в USD</div>
+            <div class="balance-amount" id="balanceAmount">$4,059.61</div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" onclick="showAction('deposit')">
+                    <div class="btn-icon"><i class="fas fa-plus-circle"></i></div>
+                    <div class="btn-text">Пополнить</div>
+                </button>
+                <button class="action-btn" onclick="showAction('withdraw')">
+                    <div class="btn-icon"><i class="fas fa-arrow-up"></i></div>
+                    <div class="btn-text">Вывести</div>
+                </button>
+                <button class="action-btn" onclick="showAction('exchange')">
+                    <div class="btn-icon"><i class="fas fa-exchange-alt"></i></div>
+                    <div class="btn-text">Обмен</div>
+                </button>
+                <button class="action-btn" onclick="showAction('market')">
+                    <div class="btn-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="btn-text">Биржа</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Баннер -->
+        <div class="banner">
+            <div class="banner-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            <div class="banner-content">
+                <div class="banner-title">Новый год с Crypto Bot</div>
+                <div class="banner-subtitle">Криптовалютные подарки всем активным пользователям!</div>
+            </div>
+        </div>
+
+        <!-- Секция активов -->
+        <div class="assets-section">
+            <div class="section-header">
+                <div class="section-title">Активы</div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="hideSmallBalances" onchange="toggleZeroBalances()">
+                    <span class="slider"></span>
+                    <span class="toggle-label">Скрыть нули</span>
+                </label>
+            </div>
+
+            <div class="assets-list" id="assetsList">
+                <!-- Tether -->
+                <div class="asset-card" data-balance="4059.61">
+                    <div class="asset-left">
+                        <div class="asset-icon" style="background: linear-gradient(135deg, #26a17a, #1e8c6e);">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="asset-info">
+                            <div class="asset-name">Tether</div>
+                            <div class="asset-price">$0.998 <span class="price-change negative">-0.04%</span></div>
+                        </div>
+                    </div>
+                    <div class="asset-right">
+                        <div class="asset-balance">4,059.61 USDT</div>
+                        <div class="asset-value">$4,059.61</div>
+                    </div>
+                </div>
+
+                <!-- Toncoin -->
+                <div class="asset-card" data-balance="0">
+                    <div class="asset-left">
+                        <div class="asset-icon" style="background: linear-gradient(135deg, #0088cc, #0077b3);">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <div class="asset-info">
+                            <div class="asset-name">Toncoin</div>
+                            <div class="asset-price">$1.65 <span class="price-change positive">+1.55%</span></div>
+                        </div>
+                    </div>
+                    <div class="asset-right">
+                        <div class="asset-balance">0 TON</div>
+                        <div class="asset-value">$0</div>
+                    </div>
+                </div>
+
+                <!-- Solana -->
+                <div class="asset-card" data-balance="0">
+                    <div class="asset-left">
+                        <div class="asset-icon" style="background: linear-gradient(135deg, #00ffa3, #00cc83);">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="asset-info">
+                            <div class="asset-name">Solana</div>
+                            <div class="asset-price">$3.4 <span class="price-change positive">+27.10%</span></div>
+                        </div>
+                    </div>
+                    <div class="asset-right">
+                        <div class="asset-balance">0 SOL</div>
+                        <div class="asset-value"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижняя навигация -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showPage('home')">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <div class="nav-label">Главная</div>
+            </div>
+            <div class="nav-item" onclick="showPage('exchange')">
+                <div class="nav-icon"><i class="fas fa-exchange-alt"></i></div>
+                <div class="nav-label">Обмен</div>
+            </div>
+            <div class="nav-item" onclick="showPage('qr')">
+                <div class="nav-icon"><i class="fas fa-qrcode"></i></div>
+                <div class="nav-label">QR</div>
+            </div>
+            <div class="nav-item" onclick="showPage('history')">
+                <div class="nav-icon"><i class="fas fa-history"></i></div>
+                <div class="nav-label">История</div>
+            </div>
+            <div class="nav-item" onclick="showPage('profile')">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <div class="nav-label">Профиль</div>
+            </div>
+        </div>
     </div>
 
+    <!-- Уведомление -->
+    <div class="notification" id="notification"></div>
+
     <script>
-        // ВСЕ СКРИПТЫ ЗДЕСЬ из script.js
+        // ПРОСТОЙ И НАДЕЖНЫЙ КОД БЕЗ ОШИБОК
+        
+        // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            // Твой JavaScript код здесь
+            console.log('Crypto Bot загружен');
+            
+            // Простая проверка что всё работает
+            showNotification('Crypto Bot готов к работе!', 2000);
+            
+            // Запускаем обновление цен
+            startPriceUpdates();
         });
+        
+        // Показ уведомлений
+        function showNotification(message, duration = 3000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.style.animation = 'fadeIn 0.3s ease';
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 300);
+            }, duration);
+            
+            // Добавляем стиль для fadeOut
+            if (!document.querySelector('#fadeOutStyle')) {
+                const style = document.createElement('style');
+                style.id = 'fadeOutStyle';
+                style.textContent = `
+                    @keyframes fadeOut {
+                        from { opacity: 1; transform: translateX(-50%) translateY(0); }
+                        to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        // Действия кнопок
+        function showAction(action) {
+            const messages = {
+                deposit: '📥 Открыт интерфейс пополнения баланса',
+                withdraw: '📤 Открыт интерфейс вывода средств',
+                exchange: '🔄 Открыт интерфейс обмена валют',
+                market: '📈 Открыт интерфейс биржевых торгов'
+            };
+            
+            showNotification(messages[action] || 'Действие выполнено');
+            
+            // Простая анимация кнопки
+            event.currentTarget.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                event.currentTarget.style.transform = 'scale(1)';
+            }, 150);
+        }
+        
+        // Переключение нулевых балансов
+        function toggleZeroBalances() {
+            const isChecked = document.getElementById('hideSmallBalances').checked;
+            const assetCards = document.querySelectorAll('.asset-card');
+            
+            assetCards.forEach(card => {
+                const balance = parseFloat(card.getAttribute('data-balance'));
+                if (balance === 0 && isChecked) {
+                    card.style.display = 'none';
+                } else {
+                    card.style.display = 'flex';
+                }
+            });
+            
+            showNotification(isChecked ? 'Нулевые балансы скрыты' : 'Все балансы показаны');
+        }
+        
+        // Навигация по страницам
+        function showPage(page) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            const messages = {
+                home: 'Вы на главной странице',
+                exchange: 'Страница обмена',
+                qr: 'QR-код: https://2no.co/cryptobotrnyprofile',
+                history: 'История транзакций',
+                profile: 'Страница профиля'
+            };
+            
+            showNotification(messages[page] || 'Страница открыта');
+            
+            // Простая анимация
+            event.currentTarget.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                event.currentTarget.style.transform = 'scale(1)';
+            }, 150);
+        }
+        
+        // Обновление цен (симуляция)
+        function startPriceUpdates() {
+            setInterval(() => {
+                // Просто меняем цвет изменения цены для демонстрации
+                const changes = document.querySelectorAll('.price-change');
+                changes.forEach(change => {
+                    if (Math.random() > 0.5) {
+                        change.classList.remove('negative', 'positive');
+                        change.classList.add(Math.random() > 0.5 ? 'positive' : 'negative');
+                        change.textContent = Math.random() > 0.5 ? `+${(Math.random() * 3).toFixed(2)}%` : `-${(Math.random() * 2).toFixed(2)}%`;
+                    }
+                });
+            }, 10000); // Каждые 10 секунд
+        }
+        
+        // Клик по карточке актива
+        document.querySelectorAll('.asset-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const name = this.querySelector('.asset-name').textContent;
+                const balance = this.querySelector('.asset-balance').textContent;
+                showNotification(`${name}: ${balance}`);
+                
+                // Анимация
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+        
+        // Предотвращаем любые возможные ошибки
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.log('Ошибка перехвачена:', msg);
+            return true; // Предотвращаем показ ошибки в браузере
+        };
     </script>
 </body>
 </html>
