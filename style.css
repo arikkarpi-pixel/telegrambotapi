@@ -1,282 +1,322 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+/* Reset и базовые стили */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
 }
 
-body {
-    background-color: #f5f5f7;
-    color: #333;
-    max-width: 500px;
-    margin: 0 auto;
-    padding-bottom: 80px;
+body { 
+    background: #232e3c; 
+    color: #99998d; 
+    max-width: 500px; 
+    margin: 0 auto; 
+    padding-bottom: 80px; 
 }
 
-.app-container {
-    background-color: #fff;
-    min-height: 100vh;
+.app-container { 
+    background: #232e3c; 
+    min-height: 100vh; 
 }
 
-/* Верхняя панель */
-.header {
-    background: linear-gradient(135deg, #0088cc, #0055cc);
-    color: white;
-    padding: 20px 15px;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
+/* Шапка */
+.header { 
+    background: #232e3c; 
+    color: #f5f5f5; 
+    padding: 20px 15px; 
+    border-bottom: 1px solid #2d3b4d;
 }
 
-.balance-display {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
+.balance-display { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    margin-bottom: 25px; 
 }
 
-.balance-label {
-    font-size: 14px;
-    opacity: 0.9;
-    margin-bottom: 5px;
+.balance-label { 
+    font-size: 14px; 
+    opacity: 0.9; 
+    margin-bottom: 8px; 
+    color: #99998d;
 }
 
-.balance-amount {
-    font-size: 36px;
-    font-weight: bold;
+.balance-amount { 
+    font-size: 42px; 
+    font-weight: bold; 
+    color: #f5f5f5;
+    text-shadow: 0 2px 10px rgba(245, 245, 245, 0.2);
 }
 
-.actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+.actions { 
+    display: flex; 
+    justify-content: space-between; 
+    gap: 10px; 
 }
 
-.action-btn {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    padding: 12px 5px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    transition: background 0.3s;
+.action-btn { 
+    flex: 1; 
+    background: #5288c1; 
+    border: none; 
+    color: #f5f5f5; 
+    padding: 14px 5px; 
+    border-radius: 12px; 
+    font-size: 13px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 6px; 
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(82, 136, 193, 0.3);
 }
 
-.action-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+.action-btn:hover { 
+    background: #5a92d0; 
+    transform: translateY(-2px);
 }
 
-.action-btn i {
-    font-size: 20px;
+.action-btn i { 
+    font-size: 22px; 
 }
 
 /* Баннер */
-.banner {
-    background: linear-gradient(90deg, #ff6b6b, #ff8e53);
-    margin: 20px 15px;
-    border-radius: 16px;
-    padding: 15px;
-    color: white;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+.banner { 
+    background: linear-gradient(90deg, #3a4a5f, #2d3b4d); 
+    margin: 20px 15px; 
+    border-radius: 16px; 
+    padding: 18px; 
+    color: #f5f5f5; 
+    border: 1px solid #3a4a5f;
 }
 
-.banner-content {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+.banner-content { 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
 }
 
-.banner-icon {
-    font-size: 30px;
-}
-
-.banner-text {
-    flex: 1;
+.banner-icon { 
+    font-size: 30px; 
+    color: #5288c1;
 }
 
 .banner-text strong {
-    font-size: 16px;
+    color: #f5f5f5;
     display: block;
     margin-bottom: 5px;
 }
 
 .banner-text p {
+    color: #99998d;
     font-size: 14px;
-    opacity: 0.9;
 }
 
 /* Секция активов */
-.assets-section {
-    padding: 0 15px;
+.assets-section { 
+    padding: 0 15px; 
 }
 
-.assets-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+.assets-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 20px; 
 }
 
-.assets-header h2 {
-    font-size: 22px;
-    font-weight: 700;
+.assets-header h2 { 
+    font-size: 20px; 
+    font-weight: 700; 
+    color: #f5f5f5;
 }
 
-.toggle-small {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #666;
+.toggle-small { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    cursor: pointer; 
+    font-size: 14px; 
+    color: #99998d; 
 }
 
-.toggle-slider {
-    position: relative;
-    width: 40px;
-    height: 20px;
-    background-color: #ccc;
-    border-radius: 20px;
-    transition: background 0.3s;
+.toggle-slider { 
+    position: relative; 
+    width: 40px; 
+    height: 20px; 
+    background: #3a4a5f; 
+    border-radius: 20px; 
 }
 
-.toggle-slider:after {
-    content: '';
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    background: white;
-    border-radius: 50%;
-    top: 1px;
-    left: 1px;
-    transition: transform 0.3s;
+.toggle-slider:after { 
+    content: ''; 
+    position: absolute; 
+    width: 18px; 
+    height: 18px; 
+    background: #5288c1; 
+    border-radius: 50%; 
+    top: 1px; 
+    left: 1px; 
+    transition: transform 0.3s; 
 }
 
-#hideSmallBalances:checked + .toggle-slider {
-    background-color: #0088cc;
+#hideSmallBalances:checked + .toggle-slider { 
+    background: #3a4a5f; 
 }
 
-#hideSmallBalances:checked + .toggle-slider:after {
-    transform: translateX(20px);
+#hideSmallBalances:checked + .toggle-slider:after { 
+    transform: translateX(20px); 
 }
 
-#hideSmallBalances {
-    display: none;
+#hideSmallBalances { 
+    display: none; 
 }
 
-.assets-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.assets-list { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
 }
 
-.asset-item {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 16px;
-    transition: background 0.3s;
+/* Элементы активов */
+.asset-item { 
+    display: flex; 
+    align-items: center; 
+    padding: 16px; 
+    background: #2d3b4d; 
+    border-radius: 16px; 
+    border: 1px solid #3a4a5f;
+    transition: all 0.3s;
 }
 
-.asset-item:hover {
-    background: #e9ecef;
+.asset-item:hover { 
+    background: #334256; 
+    border-color: #5288c1;
 }
 
-.asset-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
-    margin-right: 15px;
+.asset-icon { 
+    width: 44px; 
+    height: 44px; 
+    border-radius: 12px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    color: #f5f5f5; 
+    font-size: 20px; 
+    margin-right: 15px; 
+    background: #3a4a5f;
 }
 
-.asset-info {
-    flex: 1;
+.asset-info { 
+    flex: 1; 
 }
 
-.asset-name-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 5px;
+.asset-name-row { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 6px; 
 }
 
-.asset-name {
-    font-weight: 600;
-    font-size: 16px;
+.asset-name { 
+    font-weight: 600; 
+    font-size: 16px; 
+    color: #f5f5f5;
 }
 
-.asset-balance {
-    font-weight: 600;
-    font-size: 16px;
+.asset-balance { 
+    font-weight: 600; 
+    font-size: 16px; 
+    color: #f5f5f5;
 }
 
-.asset-price-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    color: #666;
+.asset-price-row { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 14px; 
+    color: #99998d; 
 }
 
-.asset-price {
-    font-weight: 500;
+.asset-price { 
+    font-weight: 500; 
 }
 
-.asset-change {
-    font-weight: 600;
+.asset-change { 
+    font-weight: 600; 
 }
 
-.positive {
-    color: #26a17a;
+.positive { 
+    color: #26de81; 
 }
 
-.negative {
-    color: #ff6b6b;
+.negative { 
+    color: #ff6b6b; 
 }
 
 /* Нижняя навигация */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    max-width: 500px;
-    margin: 0 auto;
-    background: white;
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 0;
-    border-top: 1px solid #eee;
+.bottom-nav { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    max-width: 500px; 
+    margin: 0 auto; 
+    background: #2d3b4d; 
+    display: flex; 
+    justify-content: space-around; 
+    padding: 14px 0; 
+    border-top: 1px solid #3a4a5f; 
     z-index: 1000;
 }
 
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: #999;
-    font-size: 12px;
-    transition: color 0.3s;
+.nav-item { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    text-decoration: none; 
+    color: #99998d; 
+    font-size: 12px; 
+    transition: all 0.3s;
 }
 
-.nav-item.active {
-    color: #0088cc;
+.nav-item.active { 
+    color: #5288c1; 
 }
 
-.nav-item i {
-    font-size: 22px;
-    margin-bottom: 4px;
+.nav-item i { 
+    font-size: 22px; 
+    margin-bottom: 4px; 
+}
+
+.nav-item:hover {
+    color: #f5f5f5;
+}
+
+/* Telegram панель */
+.telegram-panel { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    background: #2d3b4d; 
+    color: #f5f5f5; 
+    padding: 12px 15px; 
+    display: none; 
+    z-index: 1000; 
+    border-bottom: 1px solid #3a4a5f;
+}
+
+.tg-close { 
+    float: right; 
+    background: none; 
+    border: none; 
+    color: #99998d; 
+    font-size: 24px; 
+    cursor: pointer; 
+    padding: 0 10px;
+}
+
+.tg-close:hover {
+    color: #f5f5f5;
 }
 
 /* Модальные окна */
@@ -287,16 +327,39 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(35, 46, 60, 0.95);
     z-index: 2000;
     align-items: center;
     justify-content: center;
 }
 
 .modal-content {
-    background: white;
+    background: #2d3b4d;
     padding: 25px;
     border-radius: 20px;
     max-width: 90%;
     width: 400px;
+    border: 1px solid #3a4a5f;
+    color: #f5f5f5;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .balance-amount {
+        font-size: 36px;
+    }
+    
+    .action-btn {
+        padding: 12px 3px;
+        font-size: 12px;
+    }
+    
+    .action-btn i {
+        font-size: 18px;
+    }
+    
+    .banner {
+        margin: 15px 10px;
+        padding: 15px;
+    }
 }
