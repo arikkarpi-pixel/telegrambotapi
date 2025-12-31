@@ -5,82 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Bot</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Шапка -->
-        <div class="header">
+    <div class="container">
+        <!-- Основной контейнер -->
+        <div class="main-app">
+            <!-- Верхняя секция с балансом -->
             <div class="balance-section">
                 <div class="balance-label">Общий баланс в USD</div>
-                <div class="balance-amount" id="totalBalance">$4,759.61</div>
+                <div class="balance-amount">$4,759.61</div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn">
+                        <div class="btn-icon"><i class="fas fa-plus-circle"></i></div>
+                        <div class="btn-text">Пополнить</div>
+                    </button>
+                    <button class="action-btn">
+                        <div class="btn-icon"><i class="fas fa-arrow-up"></i></div>
+                        <div class="btn-text">Вывести</div>
+                    </button>
+                    <button class="action-btn">
+                        <div class="btn-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="btn-text">Обмен</div>
+                    </button>
+                    <button class="action-btn">
+                        <div class="btn-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="btn-text">Биржа</div>
+                    </button>
+                </div>
             </div>
-            <div class="action-buttons">
-                <button class="action-btn" onclick="showDeposit()">
-                    <div class="btn-icon">💳</div>
-                    <div class="btn-text">Пополнить</div>
-                </button>
-                <button class="action-btn" onclick="showWithdraw()">
-                    <div class="btn-icon">📤</div>
-                    <div class="btn-text">Вывести</div>
-                </button>
-                <button class="action-btn" onclick="showExchange()">
-                    <div class="btn-icon">🔄</div>
-                    <div class="btn-text">Обмен</div>
-                </button>
-                <button class="action-btn" onclick="showMarket()">
-                    <div class="btn-icon">📈</div>
-                    <div class="btn-text">Биржа</div>
-                </button>
+
+            <!-- Баннер -->
+            <div class="banner">
+                <div class="banner-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="banner-content">
+                    <div class="banner-title">Новый год с Crypto Bot</div>
+                    <div class="banner-subtitle">Криптовалютные подарки всем активным пользователям!</div>
+                </div>
+            </div>
+
+            <!-- Секция активов -->
+            <div class="assets-section">
+                <div class="section-header">
+                    <div class="section-title">Активы</div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="hideSmall">
+                        <span class="slider"></span>
+                        <span class="toggle-label">Скрыть мелкие балансы</span>
+                    </div>
+                </div>
+
+                <div class="assets-list">
+                    <!-- Tether -->
+                    <div class="asset-card">
+                        <div class="asset-left">
+                            <div class="asset-icon" style="background: linear-gradient(135deg, #26a17a, #1e8c6e);">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="asset-info">
+                                <div class="asset-name">Tether</div>
+                                <div class="asset-price">$0.998 <span class="price-change negative">-0.04%</span></div>
+                            </div>
+                        </div>
+                        <div class="asset-right">
+                            <div class="asset-balance">0 USDT</div>
+                            <div class="asset-value">$0</div>
+                        </div>
+                    </div>
+
+                    <!-- Toncoin -->
+                    <div class="asset-card">
+                        <div class="asset-left">
+                            <div class="asset-icon" style="background: linear-gradient(135deg, #0088cc, #0077b3);">
+                                <i class="fab fa-telegram"></i>
+                            </div>
+                            <div class="asset-info">
+                                <div class="asset-name">Toncoin</div>
+                                <div class="asset-price">$1.65 <span class="price-change positive">+1.55%</span></div>
+                            </div>
+                        </div>
+                        <div class="asset-right">
+                            <div class="asset-balance">0 TON</div>
+                            <div class="asset-value">$0</div>
+                        </div>
+                    </div>
+
+                    <!-- Solana -->
+                    <div class="asset-card">
+                        <div class="asset-left">
+                            <div class="asset-icon" style="background: linear-gradient(135deg, #00ffa3, #00cc83);">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="asset-info">
+                                <div class="asset-name">Solana</div>
+                                <div class="asset-price">$3.4 <span class="price-change positive">+27.10%</span></div>
+                            </div>
+                        </div>
+                        <div class="asset-right">
+                            <div class="asset-balance">0 SOL</div>
+                            <div class="asset-value"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Баннер -->
-        <div class="banner">
-            <div class="banner-icon">🎁</div>
-            <div class="banner-content">
-                <div class="banner-title">Новый год с Crypto Bot</div>
-                <div class="banner-description">Криптовалютные подарки всем активным пользователям!</div>
-            </div>
-        </div>
-
-        <!-- Активы -->
-        <div class="assets-section">
-            <div class="section-header">
-                <div class="section-title">Активы</div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="hideZeroBalances">
-                    <span class="toggle-slider"></span>
-                    <span class="toggle-label">Скрыть нули</span>
-                </label>
-            </div>
-            
-            <div class="assets-list" id="assetsList">
-                <!-- Активы загружаются через JS -->
-            </div>
-        </div>
-
-        <!-- Навигация -->
+        <!-- Нижняя навигация -->
         <div class="bottom-nav">
-            <a class="nav-item active" data-page="home">
-                <div class="nav-icon">🏠</div>
+            <a href="#" class="nav-item active">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
                 <div class="nav-label">Главная</div>
             </a>
-            <a class="nav-item" data-page="exchange">
-                <div class="nav-icon">🔄</div>
+            <a href="#" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-exchange-alt"></i></div>
                 <div class="nav-label">Обмен</div>
             </a>
-            <a class="nav-item" data-page="qr">
-                <div class="nav-icon">📷</div>
+            <a href="#" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-qrcode"></i></div>
                 <div class="nav-label">QR</div>
             </a>
-            <a class="nav-item" data-page="history">
-                <div class="nav-icon">📜</div>
+            <a href="#" class="nav-item">
+                <div class="nav-icon"><i class="fas fa-history"></i></div>
                 <div class="nav-label">История</div>
-            </a>
-            <a class="nav-item" data-page="profile">
-                <div class="nav-icon">👤</div>
-                <div class="nav-label">Профиль</div>
             </a>
         </div>
     </div>
