@@ -1,9 +1,6 @@
 // Данные приложения
-const appState = {
+const appData = {
     totalBalance: 4059.61,
-    balanceChange: 0,
-    userId: Math.floor(Math.random() * 1000).toString().padStart(3, '0'),
-    transactionHistory: [],
     assets: [
         { 
             name: "Tether", 
@@ -59,150 +56,74 @@ const appState = {
             color: "#00ffa3", 
             icon: "fa-fire" 
         }
-    ]
+    ],
+    userId: "001",
+    history: []
 };
 
-// Инициализация при загрузке
+// Инициализация
 document.addEventListener('DOMContentLoaded', function() {
     initApp();
-    updateUI();
-    startAutoSimulation();
 });
 
-// Основная инициализация
 function initApp() {
-    // Устанавливаем ID пользователя
-    document.getElementById('userId').textContent = appState.userId;
-    
-    // Инициализируем переключатель
-    initToggle();
-    
-    // Инициализируем историю транзакций
-    initTransactionHistory();
-    
-    // Интеграция с Telegram WebApp
-    initTelegramWebApp();
-    
-    // Добавляем обработчики событий
-    setupEventListeners();
-}
-
-// Обновление интерфейса
-function updateUI() {
-    updateBalanceDisplay();
     renderAssets();
-    updateTransactionHistory();
-}
-
-// Обновление отображения баланса
-function updateBalanceDisplay() {
-    const balanceElement = document.getElementById('totalBalance');
-    const changeElement = document.getElementById('balanceChange');
+    initToggle();
+    updateHistory();
     
-    if (balanceElement) {
-        balanceElement.textContent = `$${formatNumber(appState.totalBalance)}`;
-    }
+    // Устанавливаем ID пользователя
+    document.getElementById('userId').textContent = appData.userId;
     
-    if (changeElement) {
-        const change = appState.balanceChange;
-        changeElement.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-        changeElement.style.color = change >= 0 ? '#26de81' : '#ff6b6b';
-        changeElement.style.background = change >= 0 ? 'rgba(38, 222, 129, 0.1)' : 'rgba(255, 107, 107, 0.1)';
-    }
+    // Добавляем начальные записи в историю
+    addToHistory("Начальный баланс", 4059.61, true);
+    addToHistory("Бонус за регистрацию", 50, true);
 }
 
 // Рендеринг активов
 function renderAssets() {
     const container = document.getElementById('assetsList');
-    if (!container) return;
-    
     container.innerHTML = '';
     
-    appState.assets.forEach(asset => {
-        const assetElement = createAssetElement(asset);
-        container.appendChild(assetElement);
+    appData.assets.forEach(asset => {
+        const div = document.createElement('div');
+        div.className = 'asset-item';
+        div.innerHTML = `
+            <div class="asset-icon" style="background-color: ${asset.color};">
+                <i class="fas ${asset.icon}"></i>
+            </div>
+            <div class="asset-info">
+                <div class="asset-name-row">
+                    <span class="asset-name">${asset.name}</span>
+                    <span class="asset-balance">${formatNumber(asset.balance)} ${asset.symbol}</span>
+                </div>
+                <div class="asset-price-row">
+                    <span class="asset-price">$${asset.price.toFixed(3)}</span>
+                    ${asset.change !== 0 ? 
+                        `<span class="asset-change ${asset.change > 0 ? 'positive' : 'negative'}">
+                            ${asset.change > 0 ? '+' : ''}${asset.change}%
+                        </span>` : 
+                        '<span></span>'
+                    }
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
     });
-}
-
-// Создание элемента актива
-function createAssetElement(asset) {
-    const div = document.createElement('div');
-    div.className = 'asset-item';
-    div.onclick = () => selectAsset(asset.name);
-    
-    div.innerHTML = `
-        <div class="asset-icon" style="background: linear-gradient(135deg, ${asset.color}30, ${asset.color});">
-            <i class="fas ${asset.icon}"></i>
-        </div>
-        <div class="asset-info">
-            <div class="asset-name-row">
-                <span class="asset-name">${asset.name}</span>
-                <span class="asset-balance">${formatNumber(asset.balance)} ${asset.symbol}</span>
-            </div>
-            <div class="asset-price-row">
-                <span class="asset-price">$${asset.price.toFixed(asset.price === 0 ? 0 : 3)}</span>
-                ${asset.change !== 0 ? 
-                    `<span class="asset-change ${asset.change > 0 ? 'positive' : 'negative'}">
-                        ${asset.change > 0 ? '+' : ''}${asset.change}%
-                    </span>` : 
-                    '<span></span>'
-                }
-            </div>
-        </div>
-    `;
-    
-    return div;
 }
 
 // Форматирование чисел
 function formatNumber(num) {
     if (num === 0) return '0';
     if (num < 0.01) return num.toFixed(4);
-    if (num < 1) return num.toFixed(3);
     return num.toLocaleString('en-US', { 
         minimumFractionDigits: 2, 
         maximumFractionDigits: 2 
     });
 }
 
-// Интеграция с Telegram WebApp
-function initTelegramWebApp() {
-    if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-        
-        // Показываем панель Telegram
-        document.getElementById('telegramPanel').style.display = 'block';
-        
-        // Расширяем на весь экран
-        tg.expand();
-        tg.enableClosingConfirmation();
-        
-        // Настраиваем кнопку
-        tg.MainButton.setText("💰 Открыть баланс").show();
-        tg.MainButton.onClick(() => {
-            tg.showAlert(`Ваш баланс: $${formatNumber(appState.totalBalance)}`);
-        });
-        
-        // Отправляем данные в бота
-        tg.sendData(JSON.stringify({
-            action: "init",
-            userId: appState.userId,
-            balance: appState.totalBalance
-        }));
-    }
-}
-
-// Закрытие Telegram панели
-function closeTelegramPanel() {
-    document.getElementById('telegramPanel').style.display = 'none';
-}
-
-// Инициализация переключателя
+// Переключатель
 function initToggle() {
-    const toggle = document.getElementById('hideSmallBalances');
-    if (!toggle) return;
-    
-    toggle.addEventListener('change', function() {
+    document.getElementById('hideSmallBalances').addEventListener('change', function() {
         const items = document.querySelectorAll('.asset-item');
         items.forEach(item => {
             const balanceText = item.querySelector('.asset-balance').textContent;
@@ -216,60 +137,42 @@ function initToggle() {
     });
 }
 
-// Навигация между страницами
-function showPage(pageId) {
-    event.preventDefault();
-    
-    // Обновляем активную кнопку навигации
-    document.querySelectorAll('.nav-item').forEach(el => {
-        el.classList.remove('active');
-    });
+// Навигация
+function showPage(page) {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => item.classList.remove('active'));
     event.currentTarget.classList.add('active');
     
-    // Показываем нужную страницу
-    if (pageId === 'home') {
-        document.getElementById('profilePage').classList.add('hidden');
-        document.querySelector('.app-container > .header').style.display = 'block';
-        document.querySelector('.app-container > .banner').style.display = 'block';
-        document.querySelector('.app-container > .assets-section').style.display = 'block';
-    } else if (pageId === 'profile') {
+    if (page === 'profile') {
         document.getElementById('profilePage').classList.remove('hidden');
-        document.querySelector('.app-container > .header').style.display = 'none';
-        document.querySelector('.app-container > .banner').style.display = 'none';
-        document.querySelector('.app-container > .assets-section').style.display = 'none';
+        document.querySelector('.header').style.display = 'none';
+        document.querySelector('.banner').style.display = 'none';
+        document.querySelector('.assets-section').style.display = 'none';
+    } else if (page === 'home') {
+        document.getElementById('profilePage').classList.add('hidden');
+        document.querySelector('.header').style.display = 'block';
+        document.querySelector('.banner').style.display = 'block';
+        document.querySelector('.assets-section').style.display = 'block';
     }
 }
 
-// Добавление денег (песочница)
+// Добавление денег
 function addMoney(amount) {
-    const oldBalance = appState.totalBalance;
-    appState.totalBalance += amount;
+    const oldBalance = appData.totalBalance;
+    appData.totalBalance += amount;
     
     // Обновляем USDT баланс
-    if (appState.assets[0]) {
-        appState.assets[0].balance = appState.totalBalance;
-    }
+    appData.assets[0].balance = appData.totalBalance;
     
-    // Рассчитываем изменение
-    appState.balanceChange = ((appState.totalBalance - oldBalance) / oldBalance) * 100;
+    // Обновляем отображение
+    updateBalanceDisplay();
+    renderAssets();
     
     // Добавляем в историю
-    addTransaction({
-        type: 'deposit',
-        amount: amount,
-        description: `Пополнение песочницы +$${amount}`,
-        timestamp: new Date().toISOString(),
-        positive: true
-    });
+    addToHistory(`Добавлено +$${amount}`, amount, true);
     
-    // Обновляем интерфейс
-    updateUI();
-    
-    // Анимация
-    animateBalanceChange(amount);
-    
-    // Уведомление
-    showNotification(`Добавлено +$${amount} к балансу!`);
+    // Показываем уведомление
+    showNotification(`+$${amount} добавлено к балансу!`);
 }
 
 // Добавление кастомной суммы
@@ -277,13 +180,8 @@ function addCustomMoney() {
     const input = document.getElementById('customAmount');
     const amount = parseFloat(input.value);
     
-    if (!amount || amount <= 0) {
-        showNotification('Введите корректную сумму');
-        return;
-    }
-    
-    if (amount > 10000) {
-        showNotification('Максимальная сумма: $10,000');
+    if (!amount || amount <= 0 || amount > 10000) {
+        alert('Введите сумму от $1 до $10,000');
         return;
     }
     
@@ -291,246 +189,120 @@ function addCustomMoney() {
     input.value = '';
 }
 
-// Анимация изменения баланса
-function animateBalanceChange(amount) {
-    const balanceElement = document.getElementById('totalBalance');
-    if (!balanceElement) return;
-    
-    balanceElement.style.transform = 'scale(1.1)';
-    balanceElement.style.color = '#26de81';
-    
-    setTimeout(() => {
-        balanceElement.style.transform = 'scale(1)';
-        balanceElement.style.color = '#e1e3e6';
-    }, 300);
+// Обновление отображения баланса
+function updateBalanceDisplay() {
+    document.getElementById('totalBalance').textContent = `$${formatNumber(appData.totalBalance)}`;
 }
 
 // Сброс баланса
 function resetBalance() {
-    if (!confirm('Сбросить баланс к начальному значению?')) return;
-    
-    appState.totalBalance = 4059.61;
-    appState.balanceChange = 0;
-    
-    // Сбрасываем активы
-    appState.assets[0].balance = 4059.61;
-    appState.assets[0].change = -0.05;
-    
-    for (let i = 1; i < appState.assets.length; i++) {
-        appState.assets[i].balance = 0;
-        appState.assets[i].change = 0;
+    if (!confirm('Сбросить баланс к начальному значению $4,059.61?')) {
+        return;
     }
     
-    // Добавляем в историю
-    addTransaction({
-        type: 'reset',
-        amount: 0,
-        description: 'Сброс баланса к начальному значению',
-        timestamp: new Date().toISOString(),
-        positive: false
-    });
+    appData.totalBalance = 4059.61;
+    appData.assets[0].balance = 4059.61;
     
-    updateUI();
-    showNotification('Баланс сброшен!');
-}
-
-// Симуляция случайной сделки
-function simulateTrade() {
-    const tradeTypes = ['buy', 'sell'];
-    const assets = ['BTC', 'ETH', 'TON', 'SOL'];
-    const tradeType = tradeTypes[Math.floor(Math.random() * tradeTypes.length)];
-    const asset = assets[Math.floor(Math.random() * assets.length)];
-    const amount = Math.random() * 1000 + 10;
-    const profitLoss = (Math.random() - 0.5) * 200;
-    
-    // Обновляем баланс
-    appState.totalBalance += profitLoss;
-    if (appState.assets[0]) {
-        appState.assets[0].balance = appState.totalBalance;
+    // Сбрасываем остальные активы
+    for (let i = 1; i < appData.assets.length; i++) {
+        appData.assets[i].balance = 0;
     }
     
-    // Добавляем в историю
-    addTransaction({
-        type: 'trade',
-        amount: profitLoss,
-        description: `${tradeType === 'buy' ? 'Покупка' : 'Продажа'} ${asset} ${profitLoss >= 0 ? '+$' : '-$'}${Math.abs(profitLoss).toFixed(2)}`,
-        timestamp: new Date().toISOString(),
-        positive: profitLoss >= 0
-    });
-    
-    updateUI();
-    
-    // Уведомление
-    const message = profitLoss >= 0 
-        ? `Успешная сделка! Прибыль: +$${profitLoss.toFixed(2)}`
-        : `Убыточная сделка: -$${Math.abs(profitLoss).toFixed(2)}`;
-    
-    showNotification(message);
+    updateBalanceDisplay();
+    renderAssets();
+    addToHistory("Сброс баланса", 0, false);
+    showNotification("Баланс сброшен!");
 }
 
-// Управление историей транзакций
-function initTransactionHistory() {
-    // Добавляем начальные транзакции
-    addTransaction({
-        type: 'initial',
-        amount: 4059.61,
-        description: 'Начальный баланс',
-        timestamp: new Date().toISOString(),
-        positive: true
-    });
+// Случайная сделка
+function randomTrade() {
+    const types = ['Покупка BTC', 'Продажа ETH', 'Обмен TON', 'Торговля SOL'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const amount = (Math.random() * 500 - 250).toFixed(2);
+    const isPositive = parseFloat(amount) > 0;
     
-    addTransaction({
-        type: 'bonus',
-        amount: 50,
-        description: 'Бонус за регистрацию',
-        timestamp: new Date(Date.now() - 86400000).toISOString(),
-        positive: true
-    });
+    appData.totalBalance += parseFloat(amount);
+    appData.assets[0].balance = appData.totalBalance;
+    
+    updateBalanceDisplay();
+    renderAssets();
+    addToHistory(type, Math.abs(parseFloat(amount)), isPositive);
+    
+    const message = isPositive 
+        ? `Прибыль: +$${amount}`
+        : `Убыток: -$${Math.abs(parseFloat(amount))}`;
+    showNotification(`${type} - ${message}`);
 }
 
-function addTransaction(transaction) {
-    appState.transactionHistory.unshift(transaction);
+// История операций
+function addToHistory(description, amount, isPositive) {
+    const transaction = {
+        id: Date.now(),
+        description,
+        amount,
+        isPositive,
+        time: new Date().toLocaleTimeString('ru-RU', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        }),
+        date: new Date().toLocaleDateString('ru-RU')
+    };
     
-    // Ограничиваем историю 20 последними записями
-    if (appState.transactionHistory.length > 20) {
-        appState.transactionHistory.pop();
+    appData.history.unshift(transaction);
+    
+    // Ограничиваем историю 10 записями
+    if (appData.history.length > 10) {
+        appData.history.pop();
     }
     
-    updateTransactionHistory();
+    updateHistory();
 }
 
-function updateTransactionHistory() {
+function updateHistory() {
     const container = document.getElementById('historyList');
-    if (!container) return;
-    
     container.innerHTML = '';
     
-    appState.transactionHistory.forEach(trans => {
-        const item = document.createElement('div');
-        item.className = `history-item ${trans.positive ? 'positive' : 'negative'}`;
-        
-        const icon = getTransactionIcon(trans.type);
-        const amountSign = trans.positive ? '+' : '-';
-        
-        item.innerHTML = `
-            <div class="history-icon">
-                <i class="fas ${icon}"></i>
-            </div>
-            <div class="history-info">
-                <div class="history-title">${trans.description}</div>
-                <div class="history-details">
-                    <span>${formatTime(trans.timestamp)}</span>
-                    <span class="history-amount ${trans.positive ? '' : 'negative'}">
-                        ${amountSign}$${Math.abs(trans.amount).toFixed(2)}
-                    </span>
-                </div>
+    appData.history.forEach(transaction => {
+        const div = document.createElement('div');
+        div.className = `history-item ${transaction.isPositive ? 'positive' : 'negative'}`;
+        div.innerHTML = `
+            <div class="history-title">${transaction.description}</div>
+            <div class="history-details">
+                <span>${transaction.time} ${transaction.date}</span>
+                <span class="history-amount ${transaction.isPositive ? '' : 'negative'}">
+                    ${transaction.isPositive ? '+' : '-'}$${Math.abs(transaction.amount).toFixed(2)}
+                </span>
             </div>
         `;
-        
-        container.appendChild(item);
+        container.appendChild(div);
     });
-}
-
-function getTransactionIcon(type) {
-    const icons = {
-        'deposit': 'fa-plus-circle',
-        'withdraw': 'fa-minus-circle',
-        'trade': 'fa-exchange-alt',
-        'reset': 'fa-redo',
-        'initial': 'fa-star',
-        'bonus': 'fa-gift'
-    };
-    return icons[type] || 'fa-circle';
-}
-
-function formatTime(timestamp) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
-    
-    if (diff < 60000) return 'Только что';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)} мин назад`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)} ч назад`;
-    
-    return date.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'short'
-    });
-}
-
-// Модальные окна
-function showModal(type) {
-    const modal = document.getElementById('depositModal');
-    if (!modal) return;
-    
-    // Настраиваем модалку в зависимости от типа
-    const content = modal.querySelector('.modal-content h3');
-    if (content) {
-        const titles = {
-            'deposit': '<i class="fas fa-plus-circle"></i> Пополнение',
-            'withdraw': '<i class="fas fa-arrow-up"></i> Вывод',
-            'exchange': '<i class="fas fa-exchange-alt"></i> Обмен',
-            'market': '<i class="fas fa-chart-line"></i> Биржа'
-        };
-        content.innerHTML = titles[type] || titles.deposit;
-    }
-    
-    modal.style.display = 'flex';
-}
-
-function closeModal() {
-    const modal = document.getElementById('depositModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
 }
 
 // Уведомления
 function showNotification(message) {
-    // Создаем элемент уведомления
+    // Создаем уведомление
     const notification = document.createElement('div');
     notification.className = 'notification';
-    notification.innerHTML = `
-        <i class="fas fa-check-circle"></i>
-        <span>${message}</span>
-    `;
-    
-    // Стили для уведомления
+    notification.textContent = message;
     notification.style.cssText = `
         position: fixed;
         top: 20px;
-        right: 20px;
-        background: #26de81;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #5288c1;
         color: white;
         padding: 15px 25px;
         border-radius: 12px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
         z-index: 3000;
-        animation: slideIn 0.3s ease;
-        box-shadow: 0 4px 20px rgba(38, 222, 129, 0.3);
+        box-shadow: 0 4px 12px rgba(82, 136, 193, 0.3);
+        animation: slideDown 0.3s ease;
     `;
-    
-    // Добавляем стили для анимации
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
     
     document.body.appendChild(notification);
     
     // Удаляем через 3 секунды
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
+        notification.style.animation = 'slideUp 0.3s ease';
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.parentNode.removeChild(notification);
@@ -539,45 +311,33 @@ function showNotification(message) {
     }, 3000);
 }
 
-// Автосимуляция (случайные изменения баланса)
-function startAutoSimulation() {
-    setInterval(() => {
-        // Случайное изменение баланса ±0.5%
-        const change = (Math.random() - 0.5) * 0.01;
-        appState.totalBalance *= (1 + change);
-        
-        // Обновляем USDT баланс
-        if (appState.assets[0]) {
-            appState.assets[0].balance = appState.totalBalance;
-            appState.assets[0].change = change * 100;
-        }
-        
-        // Обновляем изменение баланса
-        appState.balanceChange = change * 100;
-        
-        updateUI();
-    }, 30000); // Каждые 30 секунд
+// Добавляем стили для анимации
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideDown {
+        from { top: -100px; opacity: 0; }
+        to { top: 20px; opacity: 1; }
+    }
+    @keyframes slideUp {
+        from { top: 20px; opacity: 1; }
+        to { top: -100px; opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+// Функции для кнопок
+function showDeposit() {
+    alert("Пополнение баланса\n\n1. Выберите криптовалюту\n2. Укажите сумму\n3. Отправьте на адрес кошелька");
 }
 
-// Выбор актива
-function selectAsset(name) {
-    showNotification(`Выбран актив: ${name}`);
+function showWithdraw() {
+    alert("Вывод средств\n\n1. Введите адрес кошелька\n2. Укажите сумму\n3. Подтвердите вывод");
 }
 
-// Настройка обработчиков событий
-function setupEventListeners() {
-    // Закрытие модального окна при клике вне его
-    window.addEventListener('click', (event) => {
-        const modal = document.getElementById('depositModal');
-        if (modal && event.target === modal) {
-            closeModal();
-        }
-    });
-    
-    // Нажатие Escape закрывает модалку
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    });
+function showExchange() {
+    alert("Обмен валют\n\nДоступные пары:\n• USDT/TON\n• USDT/BTC\n• USDT/ETH");
+}
+
+function showMarket() {
+    alert("Биржевые торги\n\nРежим песочницы - все сделки виртуальные");
 }
